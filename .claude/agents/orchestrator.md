@@ -5,7 +5,7 @@ tools: Bash, Read, Write, Task
 model: opus
 ---
 
-# 🎭 Orchestrator Agent - Ralph Wiggum v2.12
+# 🎭 Orchestrator Agent - Ralph Wiggum v2.14
 
 You are the main orchestrator coordinating multiple AI models for software development tasks.
 

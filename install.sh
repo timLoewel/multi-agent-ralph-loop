@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# install.sh - Multi-Agent Ralph Wiggum v2.12 Global Installer
+# install.sh - Multi-Agent Ralph Wiggum v2.14 Global Installer
 # Installs ralph CLI globally and integrates with Claude Code
 
 set -euo pipefail
 
-VERSION="2.12.0"
+VERSION="2.14.0"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Installation directories
@@ -215,7 +215,7 @@ configure_shell() {
             cat >> "$SHELL_RC" << 'RCEOF'
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Ralph Wiggum v2.12 - Multi-Agent Orchestration
+# Ralph Wiggum v2.14 - Multi-Agent Orchestration
 # ═══════════════════════════════════════════════════════════════════════════════
 export PATH="$HOME/.local/bin:$PATH"
 

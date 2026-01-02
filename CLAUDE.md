@@ -1,4 +1,4 @@
-# Multi-Agent Ralph v2.12
+# Multi-Agent Ralph v2.14
 
 Orchestration with adversarial validation, self-improvement, and 9-language quality gates.
 

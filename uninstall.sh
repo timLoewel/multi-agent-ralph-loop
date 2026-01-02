@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-VERSION="2.12.0"
+VERSION="2.14.0"
 
 # Installation directories
 INSTALL_DIR="${HOME}/.local/bin"

@@ -1,6 +1,6 @@
-# 🎭 Multi-Agent Ralph Wiggum v2.12
+# 🎭 Multi-Agent Ralph Wiggum v2.14
 
-![Version](https://img.shields.io/badge/version-2.12.0-blue)
+![Version](https://img.shields.io/badge/version-2.14.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-purple)
 
@@ -8,7 +8,7 @@
 
 A sophisticated multi-agent orchestration system for Claude Code that coordinates multiple AI models (Claude, Codex CLI, Gemini CLI, MiniMax) with adversarial validation, self-improvement capabilities, and comprehensive quality gates.
 
-## 🌟 What's New in v2.12
+## 🌟 What's New in v2.14
 
 - **Restored Adversarial Validation**: 2/3 consensus required (Claude + Codex + Gemini)
 - **15 Slash Commands**: All commands from v2.5-2.6 restored + new ones
@@ -65,8 +65,8 @@ A sophisticated multi-agent orchestration system for Claude Code that coordinate
 
 ```bash
 # 1. Install
-unzip multi-agent-ralph-v2.12.zip
-cd ralph-v2.12
+unzip multi-agent-ralph-v2.14.zip
+cd ralph-v2.14
 chmod +x install.sh
 ./install.sh
 source ~/.zshrc  # or ~/.bashrc
@@ -83,7 +83,7 @@ ralph --mmc loop "Extended task"
 ## 📁 Structure
 
 ```
-ralph-v2.12/
+ralph-v2.14/
 ├── .claude/
 │   ├── agents/                     # 9 specialized agents
 │   │   ├── orchestrator.md         # Main coordinator (Opus)

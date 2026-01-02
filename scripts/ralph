@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # ralph - Multi-Agent Orchestrator CLI
-# Version 2.12.0
+# Version 2.14.0
 set -euo pipefail
 
-VERSION="2.12.0"
+VERSION="2.14.0"
 RALPH_DIR="${HOME}/.ralph"
 
 # SECURITY: Use mktemp for unpredictable temp directory
@@ -76,7 +76,7 @@ log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 # ===============================================================================
 show_help() {
     cat << 'EOF'
-ralph - Multi-Agent Orchestrator CLI v2.12.0
+ralph - Multi-Agent Orchestrator CLI v2.14.0
 
 ORCHESTRATION:
   ralph orch "task"          Full orchestration (clarify->classify->execute->validate->retrospective)
@@ -597,7 +597,22 @@ cmd_retrospective() {
     log_info "Running retrospective analysis..."
     echo ""
 
-    claude --print -p "Use the retrospective skill.
+    # Detect if we're in the ralph-loop repo (for direct improvement commits)
+    local REPO_DIR=""
+    local OUTPUT_FILE=""
+
+    if [ -f "./CLAUDE.md" ] && grep -q "Multi-Agent Ralph" "./CLAUDE.md" 2>/dev/null; then
+        REPO_DIR="$(pwd)"
+        OUTPUT_FILE="${REPO_DIR}/tests/RETROSPECTIVE.md"
+        log_info "Detected ralph-loop repo: improvements will be saved to ${OUTPUT_FILE}"
+    elif git remote -v 2>/dev/null | grep -q "multi-agent-ralph"; then
+        REPO_DIR="$(git rev-parse --show-toplevel 2>/dev/null)"
+        OUTPUT_FILE="${REPO_DIR}/tests/RETROSPECTIVE.md"
+        log_info "Detected ralph-loop repo: improvements will be saved to ${OUTPUT_FILE}"
+    fi
+
+    local RETRO_OUTPUT
+    RETRO_OUTPUT=$(claude --print -p "Use the retrospective skill.
 
                        Analyze the last task completed and propose improvements to the Ralph Wiggum system.
 
@@ -610,10 +625,38 @@ cmd_retrospective() {
 
                        Output improvement proposals with:
                        - Type (routing_adjustment, clarification_enhancement, agent_behavior, new_command, delegation_update, quality_gate)
-                       - File to modify
+                       - File to modify (use paths relative to the repo root)
                        - Specific change
                        - Justification
-                       - Risk level"
+                       - Risk level
+
+                       IMPORTANT: Format output as a complete RETROSPECTIVE.md file with:
+                       - Date header
+                       - Task summary
+                       - What went well
+                       - Improvement opportunities
+                       - Proposed changes in JSON format")
+
+    echo "$RETRO_OUTPUT"
+
+    # Save to repo if detected
+    if [ -n "$OUTPUT_FILE" ]; then
+        mkdir -p "$(dirname "$OUTPUT_FILE")"
+        echo "$RETRO_OUTPUT" > "$OUTPUT_FILE"
+        echo ""
+        log_success "Retrospective saved to: $OUTPUT_FILE"
+        echo ""
+        log_info "To commit improvements:"
+        echo "  git add tests/RETROSPECTIVE.md"
+        echo "  git commit -m 'docs(retro): Add retrospective for [task description]'"
+        echo "  git push origin main"
+    else
+        # Save to global improvements dir as fallback
+        mkdir -p "$IMPROVEMENTS_DIR"
+        echo "$RETRO_OUTPUT" > "$IMPROVEMENTS_DIR/pending.md"
+        log_info "Saved to: $IMPROVEMENTS_DIR/pending.md"
+        log_info "Use 'ralph improvements' to review"
+    fi
 }
 
 cmd_improvements() {
@@ -656,7 +699,7 @@ cmd_orch() {
 
     echo ""
     echo "==============================================================="
-    echo "  RALPH WIGGUM v2.12 ORCHESTRATION"
+    echo "  RALPH WIGGUM v2.14 ORCHESTRATION"
     echo "==============================================================="
     echo ""
 
