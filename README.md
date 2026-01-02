@@ -89,8 +89,8 @@ A sophisticated multi-agent orchestration system for Claude Code that coordinate
 
 ```bash
 # 1. Install
-unzip multi-agent-ralph-v2.15.zip
-cd ralph-v2.15
+git clone https://github.com/alfredolopez80/multi-agent-ralph-loop.git
+cd multi-agent-ralph-loop
 chmod +x install.sh
 ./install.sh
 source ~/.zshrc  # or ~/.bashrc
@@ -107,7 +107,7 @@ ralph --mmc loop "Extended task"
 ## 📁 Structure
 
 ```
-ralph-v2.15/
+multi-agent-ralph-loop/
 ├── .claude/
 │   ├── agents/                     # 9 specialized agents
 │   │   ├── orchestrator.md         # Main coordinator (Opus)
@@ -136,6 +136,7 @@ ralph-v2.15/
 │   │   ├── retrospective.md
 │   │   └── improvements.md
 │   ├── hooks/
+│   │   ├── git-safety-guard.py     # PreToolUse hook (blocks destructive commands)
 │   │   └── quality-gates.sh        # Stop hook (9 languages)
 │   └── skills/
 │       ├── ask-questions-if-underspecified/
@@ -147,17 +148,30 @@ ralph-v2.15/
 │       ├── security-review.md
 │       ├── bug-hunter.md
 │       ├── test-generation.md
-│       └── ask-questions-if-underspecified.md  # NEW
+│       └── ask-questions-if-underspecified.md
 ├── .gemini/                        # Gemini CLI configuration
 │   └── GEMINI.md
 ├── scripts/
-│   ├── ralph                       # Main CLI
-│   └── mmc                         # MiniMax wrapper
+│   ├── ralph                       # Main CLI orchestrator
+│   └── mmc                         # MiniMax wrapper with usage tracking
+├── tests/                          # Comprehensive test suite (211 tests)
+│   ├── run_tests.sh                # Test runner (all/python/bash/security/v218)
+│   ├── test_git_safety_guard.py    # Python tests (65 tests)
+│   ├── test_install_security.bats  # Install script tests (30 tests)
+│   ├── test_uninstall_security.bats # Uninstall script tests (28 tests)
+│   ├── test_ralph_security.bats    # Ralph CLI tests (33 tests)
+│   ├── test_mmc_security.bats      # MiniMax wrapper tests (21 tests)
+│   ├── test_quality_gates.bats     # Quality gates tests (23 tests)
+│   └── test_settings_merge.bats    # Settings merge tests (11 tests)
 ├── config/
 │   └── models.json
 ├── CLAUDE.md                       # Quick reference
 ├── README.md
-└── install.sh
+├── TESTING.md                      # Test documentation
+├── CONTRIBUTING.md                 # Contribution guidelines
+├── LICENSE                         # BSL 1.1 License
+├── install.sh                      # Installation script
+└── uninstall.sh                    # Uninstallation script
 ```
 
 ## 🔐 Adversarial Validation
@@ -384,6 +398,49 @@ If you truly need to run a blocked command:
 | Swift | SwiftLint |
 | JSON | jq validation |
 | YAML | yamllint |
+
+## 🧪 Testing
+
+Comprehensive test suite with **211 tests** covering all components:
+
+```bash
+# Run all tests
+./tests/run_tests.sh
+
+# Run Python tests only (git-safety-guard.py)
+./tests/run_tests.sh python
+
+# Run Bash tests only (all .bats files)
+./tests/run_tests.sh bash
+
+# Run security tests only
+./tests/run_tests.sh security
+
+# Run v2.18 security fix tests only
+./tests/run_tests.sh v218
+```
+
+### Test Coverage
+
+| Component | Tests | Coverage |
+|-----------|-------|----------|
+| `git-safety-guard.py` | 65 | Command normalization, safe/blocked patterns, bypass prevention |
+| `install.sh` | 30 | Permissions, backup, dependencies, shell config |
+| `uninstall.sh` | 28 | Safe removal, settings preservation, markers |
+| `ralph` CLI | 33 | Security functions, CLI commands, iteration limits |
+| `mmc` CLI | 21 | API handling, JSON escaping, log permissions |
+| `quality-gates.sh` | 23 | Language detection, JSON validation, blocking modes |
+| `settings merge` | 11 | User config preservation, schema handling |
+
+### Requirements
+
+```bash
+# Install test dependencies
+pip install pytest pytest-cov
+brew install bats-core
+```
+
+See [TESTING.md](TESTING.md) for detailed test documentation.
 
 ## 📚 Inspiration & Credits
 
