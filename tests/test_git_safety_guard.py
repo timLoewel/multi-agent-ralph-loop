@@ -249,6 +249,98 @@ class TestBypassPrevention:
         assert blocked is True, f"Bypass attempt should be blocked: {bypass_attempt}"
 
 
+class TestCoverageGaps:
+    """Tests to achieve 95%+ coverage on missing lines."""
+
+    def create_hook_input(self, command: str) -> str:
+        """Create JSON input as would be provided by Claude Code hook system."""
+        return json.dumps({
+            "tool_name": "Bash",
+            "tool_input": {"command": command}
+        })
+
+    def test_check_blocked_pattern_returns_false_for_safe_commands(self):
+        """Line 197: check_blocked_pattern returns (False, '') for non-blocked commands."""
+        # A command that doesn't match any blocked pattern
+        command = "ls -la /home/user"
+        blocked, reason = git_safety_guard.check_blocked_pattern(command)
+        assert blocked is False
+        assert reason == ""
+
+    def test_confirmation_pattern_blocks_force_push(self, capsys):
+        """Lines 239-248: Confirmation pattern should output JSON and exit 1."""
+        input_data = self.create_hook_input("git push --force origin feature")
+        # Ensure the env var is NOT set
+        if "GIT_FORCE_PUSH_CONFIRMED" in os.environ:
+            del os.environ["GIT_FORCE_PUSH_CONFIRMED"]
+
+        with patch('sys.stdin', StringIO(input_data)):
+            with pytest.raises(SystemExit) as exc_info:
+                git_safety_guard.main()
+            assert exc_info.value.code == 1
+
+            captured = capsys.readouterr()
+            response = json.loads(captured.out)
+            assert response["decision"] == "block"
+            assert "CONFIRMATION REQUIRED" in response["reason"]
+
+    def test_command_passes_all_checks_exits_zero(self):
+        """Line 265: Commands that pass all checks should exit 0."""
+        # A command that:
+        # 1. Is NOT in safe patterns (so it goes through all checks)
+        # 2. Is NOT in blocked patterns
+        # 3. Does NOT require confirmation
+        input_data = self.create_hook_input("echo hello world")
+        with patch('sys.stdin', StringIO(input_data)):
+            with pytest.raises(SystemExit) as exc_info:
+                git_safety_guard.main()
+            assert exc_info.value.code == 0
+
+    def test_unexpected_exception_blocks_command(self, capsys):
+        """Lines 278-284: Unexpected exceptions should fail-closed."""
+        input_data = self.create_hook_input("git status")
+
+        # Mock normalize_command to raise an unexpected exception
+        with patch.object(git_safety_guard, 'normalize_command', side_effect=RuntimeError("Unexpected error")):
+            with patch('sys.stdin', StringIO(input_data)):
+                with pytest.raises(SystemExit) as exc_info:
+                    git_safety_guard.main()
+                assert exc_info.value.code == 1
+
+                captured = capsys.readouterr()
+                response = json.loads(captured.out)
+                assert response["decision"] == "block"
+                assert "Internal error" in response["reason"]
+
+    def test_non_blocked_non_safe_command_allowed(self):
+        """Test that regular commands pass through when not blocked."""
+        # Commands like 'echo', 'pwd', etc. that aren't in safe or blocked patterns
+        command = "pwd"
+        normalized = git_safety_guard.normalize_command(command)
+        blocked, reason = git_safety_guard.check_blocked_pattern(normalized)
+        assert blocked is False
+        assert reason == ""
+
+    def test_multiple_non_blocked_commands(self):
+        """Test multiple commands that should NOT be blocked."""
+        non_blocked_commands = [
+            "ls -la",
+            "cat file.txt",
+            "mkdir new_dir",
+            "cp file1 file2",
+            "mv old new",
+            "touch newfile",
+            "head -n 10 file",
+            "tail -f log.txt",
+            "grep pattern file",
+        ]
+        for cmd in non_blocked_commands:
+            normalized = git_safety_guard.normalize_command(cmd)
+            blocked, reason = git_safety_guard.check_blocked_pattern(normalized)
+            assert blocked is False, f"Command '{cmd}' should NOT be blocked"
+            assert reason == ""
+
+
 class TestEdgeCases:
     """Tests for edge cases and boundary conditions."""
 

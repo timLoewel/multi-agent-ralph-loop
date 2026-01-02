@@ -401,7 +401,7 @@ If you truly need to run a blocked command:
 
 ## 🧪 Testing
 
-Comprehensive test suite with **211 tests** covering all components:
+Comprehensive test suite with **217 tests** covering all components:
 
 ```bash
 # Run all tests
@@ -424,7 +424,7 @@ Comprehensive test suite with **211 tests** covering all components:
 
 | Component | Tests | Coverage |
 |-----------|-------|----------|
-| `git-safety-guard.py` | 65 | Command normalization, safe/blocked patterns, bypass prevention |
+| `git-safety-guard.py` | 71 | Command normalization, safe/blocked patterns, bypass prevention (99%) |
 | `install.sh` | 30 | Permissions, backup, dependencies, shell config |
 | `uninstall.sh` | 28 | Safe removal, settings preservation, markers |
 | `ralph` CLI | 33 | Security functions, CLI commands, iteration limits |

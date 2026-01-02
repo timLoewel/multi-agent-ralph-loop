@@ -136,12 +136,57 @@ bats tests/test_ralph_security.bats
 bats -v tests/
 ```
 
+## CI/CD Pipeline
+
+All PRs must pass the automated CI pipeline before merging:
+
+| Check | Tool | Requirement |
+|-------|------|-------------|
+| Python Tests | pytest | 95% coverage minimum |
+| Bash Tests | bats-core | All tests must pass |
+| Python Lint | ruff | No errors or warnings |
+| Shell Lint | shellcheck | No errors |
+| Security | CodeQL | No vulnerabilities |
+
+```bash
+# Run locally before submitting PR
+./tests/run_tests.sh           # All tests
+ruff check .claude/hooks/*.py tests/*.py   # Python lint
+shellcheck scripts/ralph scripts/mmc       # Shell lint
+```
+
+## Branch Protection
+
+The `main` branch has the following protections:
+
+- **Required status checks**: All CI jobs must pass
+- **Required reviews**: At least 1 approving review
+- **No direct pushes**: All changes must go through PRs
+- **Up-to-date branches**: PRs must be current with main
+
+### For Maintainers: Configuring Branch Protection
+
+Go to **Settings > Branches > Add rule** for `main`:
+
+1. ✅ Require a pull request before merging
+   - ✅ Require approvals: 1
+2. ✅ Require status checks to pass before merging
+   - ✅ Require branches to be up to date
+   - Add required checks:
+     - `Python Tests (95% coverage)`
+     - `Bash Tests (bats)`
+     - `Python Lint (ruff)`
+     - `Shell Lint (shellcheck)`
+     - `Security (CodeQL)`
+     - `CI Success`
+3. ✅ Do not allow bypassing the above settings
+
 ## Review Process
 
-1. **Automated checks** - Tests must pass, shellcheck must be clean
+1. **Automated checks** - CI must pass (tests, lint, security)
 2. **Code review** - At least one maintainer will review your PR
 3. **Discussion** - We may ask questions or suggest changes
-4. **Merge** - Once approved, we'll merge your contribution!
+4. **Merge** - Once approved and CI passes, we'll merge your contribution!
 
 ## Recognition
 

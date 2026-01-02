@@ -6,9 +6,9 @@ This document describes the comprehensive test suite for Multi-Agent Ralph Loop.
 
 | Category | Framework | Tests | Coverage |
 |----------|-----------|-------|----------|
-| **Python** | pytest | 65 | 86% code coverage |
+| **Python** | pytest | 71 | 99% code coverage |
 | **Bash** | bats-core | 146 | All components |
-| **Total** | - | **211** | Exhaustive validation |
+| **Total** | - | **217** | Exhaustive validation |
 
 ## Quick Start
 
@@ -31,7 +31,7 @@ brew install bats-core
 
 ### Python Tests
 
-#### `test_git_safety_guard.py` (65 tests)
+#### `test_git_safety_guard.py` (71 tests)
 
 Tests the PreToolUse hook that blocks destructive git commands.
 
@@ -43,6 +43,7 @@ Tests the PreToolUse hook that blocks destructive git commands.
 | `TestConfirmationPatterns` | 5 | Force push requires confirmation |
 | `TestMainFunction` | 6 | JSON input/output, edge cases |
 | `TestBypassPrevention` | 7 | Whitespace injection, quote bypass |
+| `TestCoverageGaps` | 6 | Lines 197, 239-248, 265, 278-284 |
 | `TestEdgeCases` | 6 | Unicode, long commands, empty input |
 
 **Run:**
